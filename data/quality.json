@@ -1,0 +1,70 @@
+{
+  "description": "Quality benchmark scores from public leaderboards. Not our data — we link to official results.",
+  "updated": "2026-03-17T00:00:00Z",
+  "models": [
+    {
+      "name": "Qwen3.5-122B-A10B",
+      "pinchbench": "84.5",
+      "swebench": null,
+      "source": "PinchBench",
+      "source_url": "https://pinchbench.com/submission/11368a5a-a1a0-418b-99a4-b3f9bd9c9900",
+      "local_delta": null,
+      "notes": "Cloud API (FP16). MoE 122B total, 10B active."
+    },
+    {
+      "name": "Qwen3.5-35B-A3B",
+      "pinchbench": "78.4",
+      "pinchbench_local": "63.7",
+      "swebench": null,
+      "source": "PinchBench",
+      "source_url": "https://pinchbench.com/submission/16a32130-0010-4b81-863b-b6fa5689f046",
+      "local_delta": "-14.7pp (Q4_K_XL)",
+      "notes": "Cloud API vs our local Q4_K_XL. MoE 35B total, 3B active."
+    },
+    {
+      "name": "Qwen3.5-27B",
+      "pinchbench": "80.4",
+      "swebench": null,
+      "source": "PinchBench",
+      "source_url": "https://pinchbench.com/submission/a898858b-05e2-4655-a158-ecd334a4e983",
+      "local_delta": null,
+      "notes": "Dense 27B. Available locally at Q5 and Q6."
+    },
+    {
+      "name": "Nemotron-3-Super-120B-A12B",
+      "pinchbench": "85.6",
+      "swebench": null,
+      "source": "PinchBench",
+      "source_url": "https://pinchbench.com/submission/df62af2b-6ff4-4bfd-920b-c9187d22a076",
+      "local_delta": null,
+      "notes": "MoE 120B total, 12B active."
+    },
+    {
+      "name": "GPT-OSS-120B",
+      "pinchbench": "54.0",
+      "swebench": null,
+      "source": "PinchBench",
+      "source_url": "https://pinchbench.com/submission/ce780020-c753-49f6-a5ea-2193974b7d42",
+      "local_delta": null,
+      "notes": "Available locally. MXFP4 native quant."
+    },
+    {
+      "name": "GPT-OSS-20B",
+      "pinchbench": "57.4",
+      "swebench": null,
+      "source": "PinchBench",
+      "source_url": "https://pinchbench.com/submission/40515fd0-ce24-4b52-895d-fd9aff4277a0",
+      "local_delta": null,
+      "notes": "Available locally."
+    },
+    {
+      "name": "Qwen3-Coder-Next (80B-A3B)",
+      "pinchbench": "79.1",
+      "swebench": null,
+      "source": "PinchBench",
+      "source_url": "https://pinchbench.com/submission/57571aa4-e90c-41ce-810d-bdc619dfdc19",
+      "local_delta": null,
+      "notes": "Coding-focused MoE. We have Qwen3-Coder-30B locally."
+    }
+  ]
+}

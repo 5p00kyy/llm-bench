@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>llm-bench — Local LLM Performance on 2× RTX 5060 Ti</title>
+  <meta name="description" content="Real-world speed and VRAM data for local LLMs on dual RTX 5060 Ti 16GB. Consumer hardware, real numbers, every quant tested.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #111;
+      --bg3: #171717;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --text: #ccc;
+      --text2: #888;
+      --text3: #555;
+      --bright: #eee;
+      --green: #00e87a;
+      --green2: #00b85f;
+      --yellow: #f0a800;
+      --red: #e84040;
+      --blue: #4a8fff;
+      --purple: #9b6fff;
+      --font: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Layout ── */
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      position: sticky; top: 0;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    .logo { font-size: 15px; font-weight: 700; }
+    .logo .name { color: var(--green); }
+    .logo .sep { color: var(--text3); margin: 0 4px; }
+    .logo .sub { color: var(--text2); font-weight: 400; font-size: 12px; }
+    nav { display: flex; gap: 2px; }
+    nav a {
+      color: var(--text2); font-size: 12px;
+      padding: 4px 10px; border-radius: 3px;
+      transition: color .15s;
+    }
+    nav a:hover { color: var(--green); }
+
+    /* ── Hero / HW badge ── */
+    .hw-bar {
+      margin: 20px 0 0;
+      padding: 12px 16px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex; align-items: center; flex-wrap: wrap; gap: 20px;
+    }
+    .hw-label { color: var(--green); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+    .hw-specs { display: flex; flex-wrap: wrap; gap: 16px; }
+    .hw-spec { color: var(--text2); font-size: 12px; }
+    .hw-spec strong { color: var(--bright); }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: blink 2s infinite; flex-shrink: 0; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── Section ── */
+    .section { margin-top: 40px; }
+    .section-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+    .section-head .prompt { color: var(--green); font-weight: 700; }
+    .section-head h2 { font-size: 15px; font-weight: 500; color: var(--bright); }
+    .section-desc { color: var(--text2); font-size: 12px; margin-bottom: 14px; line-height: 1.5; }
+
+    /* ── Callout blocks ── */
+    .callout { background: var(--bg3); border: 1px solid var(--border2); border-left: 3px solid var(--green); border-radius: 4px; padding: 10px 14px; margin-bottom: 14px; }
+    .callout.yellow { border-left-color: var(--yellow); }
+    .callout.blue { border-left-color: var(--blue); }
+    .callout-title { font-weight: 700; color: var(--bright); margin-bottom: 2px; font-size: 12px; }
+    .callout p { font-size: 12px; color: var(--text); }
+
+    /* ── Table ── */
+    .tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead th {
+      text-align: left; padding: 9px 10px;
+      background: var(--bg2); color: var(--text2);
+      font-size: 10px; text-transform: uppercase; letter-spacing: .5px;
+      border-bottom: 1px solid var(--border); white-space: nowrap;
+      cursor: pointer; user-select: none;
+    }
+    thead th:hover { color: var(--green); }
+    thead th.sort-active { color: var(--green); }
+    thead th .arr { font-size: 9px; margin-left: 3px; }
+    tbody td { padding: 9px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    tbody tr:hover td { background: var(--bg3); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Model name cell ── */
+    .m-name { font-weight: 500; color: var(--bright); }
+    .m-sub { font-size: 10px; color: var(--text3); display: block; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block; padding: 1px 6px; border-radius: 3px;
+      font-size: 10px; font-weight: 500; white-space: nowrap;
+    }
+    .badge-quant { background: #0d1f10; color: var(--green); border: 1px solid #1a3a1d; }
+    .badge-moe { background: #1a1020; color: var(--purple); border: 1px solid #2a1a3a; }
+    .badge-dense { background: #101520; color: var(--blue); border: 1px solid #1a2535; }
+    .badge-pending { background: #1a1a1a; color: var(--text3); border: 1px solid #252525; }
+
+    /* ── Speed bar ── */
+    .speed-cell { display: flex; align-items: center; gap: 8px; min-width: 100px; }
+    .speed-bar-bg { flex: 1; height: 6px; background: var(--border2); border-radius: 3px; overflow: hidden; min-width: 40px; }
+    .speed-bar-fill { height: 100%; border-radius: 3px; }
+    .speed-val { min-width: 40px; text-align: right; }
+    .fast { color: var(--green); }
+    .mid { color: var(--yellow); }
+    .slow { color: var(--red); }
+    .pending { color: var(--text3); font-style: italic; }
+
+    /* ── Score pill ── */
+    .pill {
+      display: inline-block; padding: 1px 7px; border-radius: 10px;
+      font-size: 11px; font-weight: 500;
+    }
+    .pill-hi { background: #0a1f0d; color: var(--green); border: 1px solid #133319; }
+    .pill-mid { background: #1f1800; color: var(--yellow); border: 1px solid #332600; }
+    .pill-lo { background: #1f0a0a; color: var(--red); border: 1px solid #331414; }
+    .pill-ref { background: #0d1520; color: var(--blue); border: 1px solid #1a2535; }
+
+    /* ── Chart container ── */
+    .chart-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 18px; margin-bottom: 14px;
+    }
+    .chart-title { font-size: 12px; color: var(--text2); margin-bottom: 12px; }
+
+    /* ── MoE comparison bar chart (custom) ── */
+    .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; }
+    .bar-label { width: 180px; flex-shrink: 0; font-size: 11px; color: var(--text2); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track { flex: 1; height: 20px; background: var(--bg3); border-radius: 3px; overflow: hidden; position: relative; }
+    .bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 500; color: var(--bg); transition: width .4s ease; white-space: nowrap; }
+    .bar-fill.c-green { background: var(--green); }
+    .bar-fill.c-blue { background: var(--blue); }
+    .bar-fill.c-yellow { background: var(--yellow); }
+    .bar-fill.c-purple { background: var(--purple); }
+    .bar-fill.c-red { background: var(--red); }
+
+    /* ── Size indicator ── */
+    .file-size { color: var(--text3); font-size: 11px; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border); margin-top: 60px; padding: 16px 0;
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+      color: var(--text3); font-size: 11px;
+    }
+    footer a { color: var(--green2); }
+    footer a:hover { color: var(--green); }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .hw-specs { gap: 10px; }
+      .bar-label { width: 110px; font-size: 10px; }
+    }
+
+    /* ── Section divider ── */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+    /* ── Arch legend ── */
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-inner">
+    <div class="logo">
+      <span class="name">llm-bench</span>
+      <span class="sep">/</span>
+      <span class="sub">local inference on consumer hardware</span>
+    </div>
+    <nav>
+      <a href="#speed">speed</a>
+      <a href="#vram">vram</a>
+      <a href="#quality">quality</a>
+      <a href="#about">about</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HW Badge -->
+  <div class="hw-bar">
+    <div class="hw-label">hardware</div>
+    <div class="hw-specs">
+      <div class="hw-spec"><strong>2× RTX 5060 Ti 16GB</strong></div>
+      <div class="hw-spec">60GB DDR4-2133 ECC</div>
+      <div class="hw-spec">llama.cpp</div>
+      <div class="hw-spec">tensor split 17,32</div>
+    </div>
+    <div class="live-dot" style="margin-left:auto" title="live data"></div>
+  </div>
+
+  <!-- ══ SPEED ══ -->
+  <div class="section" id="speed">
+    <div class="section-head"><span class="prompt">$</span><h2>speed — tokens per second</h2></div>
+    <p class="section-desc">
+      Generation speed (tok/s) and prompt processing (PP) measured on real hardware with consistent settings.
+      All small models fit entirely on GPU. Models listed from smallest to largest — smaller = faster generation, larger = smarter.
+    </p>
+
+    <div class="callout">
+      <div class="callout-title">MoE insight</div>
+      <p>The 35B-A3B (MoE) generates at <strong>56.9 tok/s</strong> — faster than the 27B dense (18.5 tok/s) despite being a "larger" model.
+      MoE architectures only activate a fraction of their parameters per token, so parameter count doesn't predict speed.
+      What matters is active parameters.</p>
+    </div>
+
+    <div class="tbl-wrap">
+      <table id="speed-table">
+        <thead>
+          <tr>
+            <th data-col="name">Model <span class="arr">↕</span></th>
+            <th>Arch</th>
+            <th>Quant</th>
+            <th data-col="file_size_mb" title="Model file size on disk">File</th>
+            <th data-col="gen_tok_s" title="Generation tokens per second (higher is better)">Gen tok/s <span class="arr">↕</span></th>
+            <th data-col="pp_tok_s" title="Prompt processing tokens per second (higher is better)">PP tok/s <span class="arr">↕</span></th>
+            <th data-col="load_time_s" title="Cold load time from NVMe">Load</th>
+            <th>PinchBench</th>
+          </tr>
+        </thead>
+        <tbody id="speed-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ SPEED CHART ══ -->
+  <div class="section">
+    <div class="section-head"><span class="prompt">$</span><h2>generation speed comparison</h2></div>
+    <p class="section-desc">Measured generation tok/s sorted by speed. Bars show relative performance. Models without data not shown.</p>
+
+    <div class="chart-box">
+      <div class="chart-title">generation tok/s — all tested models</div>
+      <div class="bar-chart" id="gen-chart"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══ VRAM ══ -->
+  <div class="section" id="vram">
+    <div class="section-head"><span class="prompt">$</span><h2>vram — fit map</h2></div>
+    <p class="section-desc">
+      What fits in 32GB VRAM (GPU0: 13.4GB usable, GPU1: 13.9GB usable, CPU host: ~12GB mapped).
+      Small models fit entirely on GPU0. Mid-size splits across both GPUs. The 122B spans GPU0+GPU1+CPU.
+    </p>
+
+    <div class="callout blue">
+      <div class="callout-title">Context ceiling</div>
+      <p>The 122B at Q2 hits ~51K token KV cache ceiling with f16 KV (8K ctx default).
+      Q8_0 KV cache would roughly double that to ~100K tokens at minimal quality loss.</p>
+    </div>
+
+    <div class="chart-box">
+      <div class="chart-title">estimated VRAM allocation (model weights)</div>
+      <div class="bar-chart" id="vram-chart"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══ QUALITY ══ -->
+  <div class="section" id="quality">
+    <div class="section-head"><span class="prompt">$</span><h2>quality — benchmark reference</h2></div>
+    <p class="section-desc">
+      Public benchmark scores for these model families. Cloud API scores (FP16) are from official leaderboards.
+      Where we ran local quantized versions, we show the actual score + delta vs cloud.
+    </p>
+
+    <div class="callout yellow">
+      <div class="callout-title">Cloud vs local quantized</div>
+      <p>Our local 35B-A3B (Q4_K_XL) scored 63.7% on PinchBench vs 78.4% for the cloud API version — a 14.7pp gap.
+      This is the cost of quantization. More quant comparison runs planned.</p>
+    </div>
+
+    <div class="tbl-wrap">
+      <table id="quality-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>PinchBench (cloud)</th>
+            <th>PinchBench (local)</th>
+            <th>Quant delta</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody id="quality-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══ ABOUT ══ -->
+  <div class="section" id="about">
+    <div class="section-head"><span class="prompt">$</span><h2>about</h2></div>
+    <p class="section-desc">
+      Every number on this site was measured on the hardware listed above. No cloud APIs.
+      No theoretical maximums. No cherry-picked runs.
+    </p>
+
+    <div class="callout">
+      <div class="callout-title">why this exists</div>
+      <p>
+        Cloud LLM leaderboards test models at full FP16 precision via API. That's useful for knowing what a model can do,
+        but it tells you nothing about what you can actually run at home. This site fills that gap for a specific
+        consumer GPU setup: dual RTX 5060 Ti (32GB total). Real quants, real VRAM numbers, real tok/s.
+      </p>
+    </div>
+
+    <div class="callout blue">
+      <div class="callout-title">in progress</div>
+      <p>
+        Speed data: ✅ small models done, 27B done, 35B done, 122B pending<br>
+        VRAM maps: partial (file sizes known, live measurements in progress)<br>
+        PinchBench local runs: 35B done (63.7%), 27B and 122B pending<br>
+        Terminal-bench: planned<br>
+        Context scaling charts: planned
+      </p>
+    </div>
+  </div>
+
+</main>
+
+<footer class="wrap">
+  <span>llm-bench — 2× RTX 5060 Ti 16GB · llama.cpp · real numbers</span>
+  <span>
+    <a href="https://github.com/5p00kyy/llm-bench">github</a> ·
+    <a href="https://5p00ky.dev">5p00ky.dev</a> ·
+    updated <span id="ts">—</span>
+  </span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+const DATA = 'data/summary.json';
+const QUALITY = 'data/quality.json';
+
+// ── Helpers ──────────────────────────────────────────────────────
+function speedClass(v) {
+  if (!v) return 'pending';
+  if (v >= 80) return 'fast';
+  if (v >= 30) return 'mid';
+  return 'slow';
+}
+
+function speedBar(v, max) {
+  if (!v) return `<span class="pending">—</span>`;
+  const pct = Math.min(100, (v / max) * 100).toFixed(1);
+  const cls = v >= 80 ? 'c-green' : v >= 30 ? 'c-yellow' : 'c-red';
+  return `<div class="speed-cell">
+    <div class="speed-bar-bg"><div class="speed-bar-fill" style="width:${pct}%;background:var(${v>=80?'--green':v>=30?'--yellow':'--red'})"></div></div>
+    <span class="speed-val ${speedClass(v)}">${v}</span>
+  </div>`;
+}
+
+function fmtSize(mb) {
+  if (!mb) return '—';
+  if (mb >= 1024) return (mb/1024).toFixed(1) + ' GB';
+  return mb + ' MB';
+}
+
+function pill(score, ref) {
+  if (!score) return '<span class="pending">—</span>';
+  const n = parseFloat(score);
+  const cls = n >= 75 ? 'pill-hi' : n >= 50 ? 'pill-mid' : 'pill-lo';
+  const title = ref ? ' title="cloud API (FP16)"' : '';
+  return `<span class="pill ${cls}"${title}>${score}%${ref ? ' ↗' : ''}</span>`;
+}
+
+function archBadge(arch) {
+  if (arch === 'moe') return '<span class="badge badge-moe">MoE</span>';
+  return '<span class="badge badge-dense">dense</span>';
+}
+
+// ── Speed table ──────────────────────────────────────────────────
+async function buildSpeedTable() {
+  const resp = await fetch(DATA).catch(() => null);
+  if (!resp?.ok) return;
+  const d = await resp.json();
+
+  if (d.updated) document.getElementById('ts').textContent = new Date(d.updated).toLocaleDateString('en-AU', {year:'numeric',month:'short',day:'numeric'});
+
+  const models = d.models || [];
+  const maxGen = Math.max(...models.filter(m=>m.gen_tok_s).map(m=>m.gen_tok_s), 1);
+
+  const tbody = document.getElementById('speed-body');
+  tbody.innerHTML = models.map(m => {
+    const pb_local = m.pinchbench_local ? pill(m.pinchbench_local) : null;
+    const pb_ref = m.pinchbench_score ? pill(m.pinchbench_score, true) : null;
+    const pb_cell = pb_local ? pb_local : (pb_ref ? pb_ref : '<span class="pending">—</span>');
+
+    return `<tr data-gen="${m.gen_tok_s||0}" data-pp="${m.pp_tok_s||0}" data-size="${m.file_size_mb||0}">
+      <td>
+        <span class="m-name">${m.name}</span>
+        ${m.arch === 'moe' ? `<span class="m-sub">${m.params}</span>` : ''}
+      </td>
+      <td>${archBadge(m.arch)}</td>
+      <td><span class="badge badge-quant">${m.quant || '—'}</span></td>
+      <td class="file-size">${fmtSize(m.file_size_mb)}</td>
+      <td>${speedBar(m.gen_tok_s, maxGen)}</td>
+      <td class="${speedClass(m.pp_tok_s)}">${m.pp_tok_s || '<span class="pending">—</span>'}</td>
+      <td class="${m.load_time_s ? 'text2' : 'pending'}">${m.load_time_s ? m.load_time_s + 's' : '—'}</td>
+      <td>${pb_cell}</td>
+    </tr>`;
+  }).join('');
+
+  // Gen speed bar chart
+  const tested = models.filter(m => m.gen_tok_s).sort((a,b) => b.gen_tok_s - a.gen_tok_s);
+  const chartMax = Math.max(...tested.map(m=>m.gen_tok_s));
+  const colors = ['c-green','c-green','c-green','c-yellow','c-yellow','c-yellow','c-blue','c-purple','c-purple','c-red','c-red'];
+  const chart = document.getElementById('gen-chart');
+  chart.innerHTML = tested.map((m, i) => {
+    const pct = ((m.gen_tok_s / chartMax) * 100).toFixed(1);
+    const label = m.arch === 'moe' ? `${m.name} [MoE]` : m.name;
+    const c = colors[Math.min(i, colors.length-1)];
+    return `<div class="bar-row">
+      <div class="bar-label">${label}</div>
+      <div class="bar-track">
+        <div class="bar-fill ${c}" style="width:${pct}%">${m.gen_tok_s} tok/s</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // VRAM chart (using file size as proxy until live data available)
+  const vramData = models
+    .filter(m => m.file_size_mb > 0)
+    .sort((a, b) => a.file_size_mb - b.file_size_mb);
+  const vramMax = Math.max(...vramData.map(m=>m.file_size_mb));
+  const vramColors = ['c-green','c-green','c-green','c-blue','c-blue','c-blue','c-yellow','c-yellow','c-yellow','c-red','c-red','c-red','c-red','c-red','c-red'];
+  const vramChart = document.getElementById('vram-chart');
+  const GPU_TOTAL = 32768; // 32GB in MB
+
+  vramChart.innerHTML = vramData.map((m, i) => {
+    const pct = ((m.file_size_mb / (GPU_TOTAL * 1.2)) * 100).toFixed(1);
+    const label = m.arch === 'moe' ? `${m.name} [MoE]` : m.name;
+    const c = vramColors[Math.min(i, vramColors.length-1)];
+    const fits = m.file_size_mb <= GPU_TOTAL ? '✓ fits' : '⚠ overflow';
+    return `<div class="bar-row">
+      <div class="bar-label">${label}</div>
+      <div class="bar-track">
+        <div class="bar-fill ${c}" style="width:${Math.min(pct, 100)}%">${fmtSize(m.file_size_mb)} — ${fits}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Quality table ────────────────────────────────────────────────
+async function buildQualityTable() {
+  const resp = await fetch(QUALITY).catch(() => null);
+  if (!resp?.ok) return;
+  const d = await resp.json();
+  const tbody = document.getElementById('quality-body');
+  tbody.innerHTML = (d.models || []).map(m => {
+    const cloud = m.pinchbench ? `<a href="${m.source_url||'#'}" target="_blank">${pill(m.pinchbench, true)}</a>` : '<span class="pending">—</span>';
+    const local = m.pinchbench_local ? pill(m.pinchbench_local) : '<span class="pending">—</span>';
+    const delta = m.local_delta || '—';
+    return `<tr>
+      <td class="m-name">${m.name}</td>
+      <td>${cloud}</td>
+      <td>${local}</td>
+      <td style="color:var(${m.local_delta?.startsWith('-') ? '--red' : '--text2'})">${delta}</td>
+      <td><a href="${m.source_url||'#'}" target="_blank" style="color:var(--blue);font-size:11px">${m.source||'—'} ↗</a></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Sort ─────────────────────────────────────────────────────────
+document.querySelectorAll('th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    const table = th.closest('table');
+    const tbody = table.querySelector('tbody');
+    const rows = [...tbody.querySelectorAll('tr')];
+    const asc = th.classList.toggle('sort-asc');
+    table.querySelectorAll('th').forEach(h => { if (h !== th) h.classList.remove('sort-active','sort-asc'); });
+    th.classList.add('sort-active');
+    rows.sort((a, b) => {
+      const av = parseFloat(a.dataset[col] || 0);
+      const bv = parseFloat(b.dataset[col] || 0);
+      return asc ? av - bv : bv - av;
+    });
+    rows.forEach(r => tbody.appendChild(r));
+  });
+});
+
+// ── Init ─────────────────────────────────────────────────────────
+buildSpeedTable();
+buildQualityTable();
+</script>
+</body>
+</html>
