@@ -3,8 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>llm-bench — Local LLM Performance on 2× RTX 5060 Ti</title>
-  <meta name="description" content="Real-world speed and VRAM data for local LLMs on dual RTX 5060 Ti 16GB. Consumer hardware, real numbers, every quant tested.">
+  <title>llm-bench</title>
+  <meta name="description" content="Real-world speed and VRAM data for local LLMs on dual RTX 5060 Ti 16GB. Consumer hardware, real numbers.">
+  <meta property="og:title" content="llm-bench — Local LLM Inference Benchmarks">
+  <meta property="og:description" content="Measured tok/s for local LLMs on 2× RTX 5060 Ti 16GB.">
+  <meta property="og:url" content="https://5p00kyy.github.io/llm-bench/">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#22c55e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="llm-bench">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
@@ -155,7 +166,8 @@
     .bar-row { display: flex; align-items: center; gap: 10px; }
     .bar-label { width: 180px; flex-shrink: 0; font-size: 11px; color: var(--text2); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .bar-track { flex: 1; height: 20px; background: var(--bg3); border-radius: 3px; overflow: hidden; position: relative; }
-    .bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 500; color: var(--bg); transition: width .4s ease; white-space: nowrap; }
+    .bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 500; color: var(--bg); transition: width .4s ease; white-space: nowrap; overflow: visible; position: relative; }
+    .bar-outer-label { position: absolute; left: calc(100% + 8px); color: var(--text); font-size: 11px; white-space: nowrap; }
     .bar-fill.c-green { background: var(--green); }
     .bar-fill.c-blue { background: var(--blue); }
     .bar-fill.c-yellow { background: var(--yellow); }
@@ -176,8 +188,17 @@
 
     /* ── Responsive ── */
     @media (max-width: 700px) {
-      .hw-specs { gap: 10px; }
-      .bar-label { width: 110px; font-size: 10px; }
+      .header-inner { flex-direction: column; align-items: flex-start; gap: 6px; }
+      nav { flex-wrap: wrap; }
+      nav a { margin-left: 0; margin-right: 12px; font-size: 11px; }
+      .hw-bar { flex-direction: column; gap: 8px; padding: 10px 12px; }
+      .hw-specs { gap: 8px; }
+      .hw-spec { font-size: 11px; }
+      .bar-label { width: 90px; font-size: 9px; }
+      .bar-track { height: 18px; }
+      .section-head h2 { font-size: 13px; }
+      .section-desc { font-size: 11px; }
+      footer { flex-direction: column; font-size: 10px; }
     }
 
     /* ── Section divider ── */
@@ -216,7 +237,6 @@
       <div class="hw-spec"><strong>2× RTX 5060 Ti 16GB</strong></div>
       <div class="hw-spec">60GB DDR4-2133 ECC</div>
       <div class="hw-spec">llama.cpp</div>
-      <div class="hw-spec">tensor split 17,32</div>
     </div>
     <div class="live-dot" style="margin-left:auto" title="live data"></div>
   </div>
@@ -224,17 +244,7 @@
   <!-- ══ SPEED ══ -->
   <div class="section" id="speed">
     <div class="section-head"><span class="prompt">$</span><h2>speed — tokens per second</h2></div>
-    <p class="section-desc">
-      Generation speed (tok/s) and prompt processing (PP) measured on real hardware with consistent settings.
-      All small models fit entirely on GPU. Models listed from smallest to largest — smaller = faster generation, larger = smarter.
-    </p>
-
-    <div class="callout">
-      <div class="callout-title">MoE insight</div>
-      <p>The 35B-A3B (MoE) generates at <strong>56.9 tok/s</strong> — faster than the 27B dense (18.5 tok/s) despite being a "larger" model.
-      MoE architectures only activate a fraction of their parameters per token, so parameter count doesn't predict speed.
-      What matters is active parameters.</p>
-    </div>
+    <p class="section-desc">Best of 3 runs per test.</p>
 
     <div class="tbl-wrap">
       <table id="speed-table">
@@ -258,10 +268,10 @@
   <!-- ══ SPEED CHART ══ -->
   <div class="section">
     <div class="section-head"><span class="prompt">$</span><h2>generation speed comparison</h2></div>
-    <p class="section-desc">Measured generation tok/s sorted by speed. Bars show relative performance. Models without data not shown.</p>
+    <p class="section-desc"></p>
 
     <div class="chart-box">
-      <div class="chart-title">generation tok/s — all tested models</div>
+      <div class="chart-title">generation tok/s</div>
       <div class="bar-chart" id="gen-chart"></div>
     </div>
   </div>
@@ -271,19 +281,10 @@
   <!-- ══ VRAM ══ -->
   <div class="section" id="vram">
     <div class="section-head"><span class="prompt">$</span><h2>vram — fit map</h2></div>
-    <p class="section-desc">
-      What fits in 32GB VRAM (GPU0: 13.4GB usable, GPU1: 13.9GB usable, CPU host: ~12GB mapped).
-      Small models fit entirely on GPU0. Mid-size splits across both GPUs. The 122B spans GPU0+GPU1+CPU.
-    </p>
-
-    <div class="callout blue">
-      <div class="callout-title">Context ceiling</div>
-      <p>The 122B at Q2 hits ~51K token KV cache ceiling with f16 KV (8K ctx default).
-      Q8_0 KV cache would roughly double that to ~100K tokens at minimal quality loss.</p>
-    </div>
+    <p class="section-desc">Model weight sizes across available models. 32GB total VRAM across both GPUs.</p>
 
     <div class="chart-box">
-      <div class="chart-title">estimated VRAM allocation (model weights)</div>
+      <div class="chart-title">model weight size</div>
       <div class="bar-chart" id="vram-chart"></div>
     </div>
   </div>
@@ -293,16 +294,7 @@
   <!-- ══ QUALITY ══ -->
   <div class="section" id="quality">
     <div class="section-head"><span class="prompt">$</span><h2>quality — benchmark reference</h2></div>
-    <p class="section-desc">
-      Public benchmark scores for these model families. Cloud API scores (FP16) are from official leaderboards.
-      Where we ran local quantized versions, we show the actual score + delta vs cloud.
-    </p>
-
-    <div class="callout yellow">
-      <div class="callout-title">Cloud vs local quantized</div>
-      <p>Our local 35B-A3B (Q4_K_XL) scored 63.7% on PinchBench vs 78.4% for the cloud API version — a 14.7pp gap.
-      This is the cost of quantization. More quant comparison runs planned.</p>
-    </div>
+    <p class="section-desc">Cloud API scores from public leaderboards. Local quant scores where tested.</p>
 
     <div class="tbl-wrap">
       <table id="quality-table">
@@ -326,29 +318,9 @@
   <div class="section" id="about">
     <div class="section-head"><span class="prompt">$</span><h2>about</h2></div>
     <p class="section-desc">
-      Every number on this site was measured on the hardware listed above. No cloud APIs.
-      No theoretical maximums. No cherry-picked runs.
+      Every number measured on the hardware above. No cloud APIs, no theoretical maximums.
+      More models and benchmarks added as they're tested.
     </p>
-
-    <div class="callout">
-      <div class="callout-title">why this exists</div>
-      <p>
-        Cloud LLM leaderboards test models at full FP16 precision via API. That's useful for knowing what a model can do,
-        but it tells you nothing about what you can actually run at home. This site fills that gap for a specific
-        consumer GPU setup: dual RTX 5060 Ti (32GB total). Real quants, real VRAM numbers, real tok/s.
-      </p>
-    </div>
-
-    <div class="callout blue">
-      <div class="callout-title">in progress</div>
-      <p>
-        Speed data: ✅ small models done, 27B done, 35B done, 122B pending<br>
-        VRAM maps: partial (file sizes known, live measurements in progress)<br>
-        PinchBench local runs: 35B done (63.7%), 27B and 122B pending<br>
-        Terminal-bench: planned<br>
-        Context scaling charts: planned
-      </p>
-    </div>
   </div>
 
 </main>
@@ -412,8 +384,9 @@ async function buildSpeedTable() {
 
   if (d.updated) document.getElementById('ts').textContent = new Date(d.updated).toLocaleDateString('en-AU', {year:'numeric',month:'short',day:'numeric'});
 
-  const models = d.models || [];
-  const maxGen = Math.max(...models.filter(m=>m.gen_tok_s).map(m=>m.gen_tok_s), 1);
+  // Only show models with actual speed data
+  const models = (d.models || []).filter(m => m.gen_tok_s);
+  const maxGen = Math.max(...models.map(m=>m.gen_tok_s), 1);
 
   const tbody = document.getElementById('speed-body');
   tbody.innerHTML = models.map(m => {
@@ -445,17 +418,19 @@ async function buildSpeedTable() {
     const pct = ((m.gen_tok_s / chartMax) * 100).toFixed(1);
     const label = m.arch === 'moe' ? `${m.name} [MoE]` : m.name;
     const c = colors[Math.min(i, colors.length-1)];
+    const isSmall = parseFloat(pct) < 20;
+    const valStr = `${m.gen_tok_s} tok/s`;
     return `<div class="bar-row">
       <div class="bar-label">${label}</div>
       <div class="bar-track">
-        <div class="bar-fill ${c}" style="width:${pct}%">${m.gen_tok_s} tok/s</div>
+        <div class="bar-fill ${c}" style="width:${pct}%">${isSmall ? '' : valStr}${isSmall ? `<span class="bar-outer-label">${valStr}</span>` : ''}</div>
       </div>
     </div>`;
   }).join('');
 
-  // VRAM chart (using file size as proxy until live data available)
+  // VRAM chart — only tested models
   const vramData = models
-    .filter(m => m.file_size_mb > 0)
+    .filter(m => m.file_size_mb > 0 && m.gen_tok_s)
     .sort((a, b) => a.file_size_mb - b.file_size_mb);
   const vramMax = Math.max(...vramData.map(m=>m.file_size_mb));
   const vramColors = ['c-green','c-green','c-green','c-blue','c-blue','c-blue','c-yellow','c-yellow','c-yellow','c-red','c-red','c-red','c-red','c-red','c-red'];
@@ -466,11 +441,15 @@ async function buildSpeedTable() {
     const pct = ((m.file_size_mb / (GPU_TOTAL * 1.2)) * 100).toFixed(1);
     const label = m.arch === 'moe' ? `${m.name} [MoE]` : m.name;
     const c = vramColors[Math.min(i, vramColors.length-1)];
-    const fits = m.file_size_mb <= GPU_TOTAL ? '✓ fits' : '⚠ overflow';
+    const sizeStr = fmtSize(m.file_size_mb);
+    // Small bars: put label outside. Large bars: inside.
+    const isSmall = parseFloat(pct) < 25;
+    const innerText = isSmall ? '' : sizeStr;
+    const outerText = isSmall ? `<span class="bar-outer-label">${sizeStr}</span>` : '';
     return `<div class="bar-row">
       <div class="bar-label">${label}</div>
       <div class="bar-track">
-        <div class="bar-fill ${c}" style="width:${Math.min(pct, 100)}%">${fmtSize(m.file_size_mb)} — ${fits}</div>
+        <div class="bar-fill ${c}" style="width:${Math.min(pct, 100)}%">${innerText}${outerText}</div>
       </div>
     </div>`;
   }).join('');
