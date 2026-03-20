@@ -253,6 +253,7 @@
             <th data-col="name">Model <span class="arr">↕</span></th>
             <th>Arch</th>
             <th>Quant</th>
+            <th data-col="context_k" title="Configured context window size (tokens)">Ctx <span class="arr">↕</span></th>
             <th data-col="file_size_mb" title="Model file size on disk">File</th>
             <th data-col="gen_tok_s" title="Generation tokens per second (higher is better)">Gen tok/s <span class="arr">↕</span></th>
             <th data-col="pp_tok_s" title="Prompt processing tokens per second (higher is better)">PP tok/s <span class="arr">↕</span></th>
@@ -394,13 +395,14 @@ async function buildSpeedTable() {
     const pb_ref = m.pinchbench_score ? pill(m.pinchbench_score, true) : null;
     const pb_cell = pb_local ? pb_local : (pb_ref ? pb_ref : '<span class="pending">—</span>');
 
-    return `<tr data-gen="${m.gen_tok_s||0}" data-pp="${m.pp_tok_s||0}" data-size="${m.file_size_mb||0}">
+    return `<tr data-gen="${m.gen_tok_s||0}" data-pp="${m.pp_tok_s||0}" data-size="${m.file_size_mb||0}" data-context_k="${m.context_k||0}">
       <td>
         <span class="m-name">${m.name}</span>
         ${m.arch === 'moe' ? `<span class="m-sub">${m.params}</span>` : ''}
       </td>
       <td>${archBadge(m.arch)}</td>
       <td><span class="badge badge-quant">${m.quant || '—'}</span></td>
+      <td class="file-size">${m.context_k ? m.context_k + 'K' : '—'}</td>
       <td class="file-size">${fmtSize(m.file_size_mb)}</td>
       <td>${speedBar(m.gen_tok_s, maxGen)}</td>
       <td class="${speedClass(m.pp_tok_s)}">${m.pp_tok_s || '<span class="pending">—</span>'}</td>
