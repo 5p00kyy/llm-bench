@@ -18,7 +18,9 @@
       "vram_total_mb": null,
       "notes": "Extremely fast. Good for simple tasks.",
       "pinchbench_score": null,
-      "pinchbench_url": null
+      "pinchbench_url": null,
+      "params_b": 0.8,
+      "context_k": 128
     },
     {
       "id": "Qwen3.5-2B",
@@ -34,7 +36,9 @@
       "vram_total_mb": null,
       "notes": null,
       "pinchbench_score": null,
-      "pinchbench_url": null
+      "pinchbench_url": null,
+      "params_b": 2.0,
+      "context_k": 128
     },
     {
       "id": "Qwen3.5-4B",
@@ -50,7 +54,9 @@
       "vram_total_mb": null,
       "notes": null,
       "pinchbench_score": null,
-      "pinchbench_url": null
+      "pinchbench_url": null,
+      "params_b": 4.0,
+      "context_k": 128
     },
     {
       "id": "Qwen3.5-9B",
@@ -66,7 +72,9 @@
       "vram_total_mb": null,
       "notes": null,
       "pinchbench_score": null,
-      "pinchbench_url": null
+      "pinchbench_url": null,
+      "params_b": 9.0,
+      "context_k": 128
     },
     {
       "id": "Qwen3.5-27B",
@@ -83,7 +91,9 @@
       "notes": "Fits entirely on GPU0. Slow load from disk.",
       "pinchbench_score": "80.4",
       "pinchbench_url": "https://pinchbench.com/submission/a898858b-05e2-4655-a158-ecd334a4e983",
-      "pinchbench_note": "Cloud API (FP16)"
+      "pinchbench_note": "Cloud API (FP16)",
+      "params_b": 27.0,
+      "context_k": 64
     },
     {
       "id": "Qwen3.5-27B-Q5",
@@ -99,7 +109,9 @@
       "vram_total_mb": null,
       "notes": "Not yet tested",
       "pinchbench_score": null,
-      "pinchbench_url": null
+      "pinchbench_url": null,
+      "params_b": 27.0,
+      "context_k": 64
     },
     {
       "id": "Qwen3.5-27B-Q6",
@@ -115,7 +127,9 @@
       "vram_total_mb": null,
       "notes": "Not yet tested",
       "pinchbench_score": null,
-      "pinchbench_url": null
+      "pinchbench_url": null,
+      "params_b": 27.0,
+      "context_k": 64
     },
     {
       "id": "Qwen3.5-35B-A3B",
@@ -133,7 +147,9 @@
       "pinchbench_score": "78.4",
       "pinchbench_url": "https://pinchbench.com/submission/16a32130-0010-4b81-863b-b6fa5689f046",
       "pinchbench_local": "63.7",
-      "pinchbench_note": "78.4% = cloud API (FP16). 63.7% = our local Q4_K_XL run."
+      "pinchbench_note": "78.4% = cloud API (FP16). 63.7% = our local Q4_K_XL run.",
+      "params_b": 35.0,
+      "context_k": 128
     },
     {
       "id": "Qwen3.5-40B-Thinking",
@@ -149,7 +165,9 @@
       "vram_total_mb": null,
       "notes": "Claude 4.5 Opus High Reasoning Thinking distill (mradermacher). Not yet tested.",
       "pinchbench_score": null,
-      "pinchbench_url": null
+      "pinchbench_url": null,
+      "params_b": 40.0,
+      "context_k": 32
     },
     {
       "id": "Qwen3-Coder-30B",
@@ -165,7 +183,9 @@
       "vram_total_mb": null,
       "notes": "Coding-focused MoE (A3B). 1M context. Not yet tested.",
       "pinchbench_score": null,
-      "pinchbench_url": null
+      "pinchbench_url": null,
+      "params_b": 30.0,
+      "context_k": 64
     },
     {
       "id": "Qwen3.5-122B-A10B",
@@ -182,7 +202,9 @@
       "notes": "Splits across both GPUs + CPU host. 8K context at Q2. Not yet re-tested after session fix.",
       "pinchbench_score": "84.5",
       "pinchbench_url": "https://pinchbench.com/submission/11368a5a-a1a0-418b-99a4-b3f9bd9c9900",
-      "pinchbench_note": "Cloud API (FP16)"
+      "pinchbench_note": "Cloud API (FP16)",
+      "params_b": 122.0,
+      "context_k": 8
     },
     {
       "id": "Qwen3.5-122B-A10B-IQ3",
@@ -198,7 +220,9 @@
       "vram_total_mb": null,
       "notes": "Larger quant file but better quality than Q2. Not yet tested.",
       "pinchbench_score": null,
-      "pinchbench_url": null
+      "pinchbench_url": null,
+      "params_b": 122.0,
+      "context_k": 8
     },
     {
       "id": "GPT-OSS-120B",
@@ -215,7 +239,9 @@
       "notes": "Native MXFP4 quant (not post-hoc). 60GB model \u2014 requires CPU offload at current VRAM.",
       "pinchbench_score": "54.0",
       "pinchbench_url": "https://pinchbench.com/submission/ce780020-c753-49f6-a5ea-2193974b7d42",
-      "pinchbench_note": "Cloud API"
+      "pinchbench_note": "Cloud API",
+      "params_b": 120.0,
+      "context_k": 128
     },
     {
       "id": "GLM-4.7-Flash",
@@ -231,7 +257,9 @@
       "vram_total_mb": null,
       "notes": "Coding-focused MoE (A3B). 200K context. Not yet tested.",
       "pinchbench_score": null,
-      "pinchbench_url": null
+      "pinchbench_url": null,
+      "params_b": 30.0,
+      "context_k": 200
     }
   ]
 }
