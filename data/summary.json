@@ -2,7 +2,7 @@
   "description": "Speed and VRAM data for local models on 2x RTX 5060 Ti 16GB",
   "hardware": "2x RTX 5060 Ti 16GB (32GB total), 60GB DDR4-2133 ECC, llama.cpp",
   "tensor_split": "17,32 \u2014 GPU0: ~13.4GB, GPU1: ~13.9GB",
-  "updated": "2026-03-20T00:00:00Z",
+  "updated": "2026-03-23T00:00:00Z",
   "models": [
     {
       "id": "Qwen3.5-0.8B",
@@ -152,6 +152,24 @@
       "context_k": 128
     },
     {
+      "id": "Qwen3.5-35B-A3B-Q5",
+      "name": "Qwen3.5-35B-A3B",
+      "family": "Qwen3.5",
+      "params": "35B total / 3B active",
+      "quant": "Q5_K_M",
+      "arch": "moe",
+      "file_size_mb": 24576,
+      "gen_tok_s": 76.7,
+      "pp_tok_s": 1530.3,
+      "load_time_s": null,
+      "vram_total_mb": null,
+      "notes": "Uncensored variant. MoE — tensor-split unsupported, auto-split ngl=41. Benchmarked with ik_llama.cpp (gen) and llama.cpp (pp). Best gen speed of any 35B+ model tested.",
+      "pinchbench_score": null,
+      "pinchbench_url": null,
+      "params_b": 35.0,
+      "context_k": 128
+    },
+    {
       "id": "Qwen3.5-40B-Thinking",
       "name": "Qwen3.5-40B-Opus-Reasoning-Distill",
       "family": "Qwen3.5",
@@ -199,7 +217,7 @@
       "pp_tok_s": null,
       "load_time_s": null,
       "vram_total_mb": 27320,
-      "notes": "Splits across both GPUs + CPU host. 8K context at Q2. Not yet re-tested after session fix.",
+      "notes": "Splits across both GPUs + CPU host. 8K context at Q2. Tested 2026-03-22 — loads and generates correctly. Speed not yet formally benchmarked.",
       "pinchbench_score": "84.5",
       "pinchbench_url": "https://pinchbench.com/submission/11368a5a-a1a0-418b-99a4-b3f9bd9c9900",
       "pinchbench_note": "Cloud API (FP16)",
