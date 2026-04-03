@@ -20,7 +20,8 @@
       "pinchbench_score": null,
       "pinchbench_url": null,
       "params_b": 0.8,
-      "context_k": 128
+      "context_k": 128,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Qwen3.5-2B",
@@ -38,7 +39,8 @@
       "pinchbench_score": null,
       "pinchbench_url": null,
       "params_b": 2.0,
-      "context_k": 128
+      "context_k": 128,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Qwen3.5-4B",
@@ -56,7 +58,8 @@
       "pinchbench_score": null,
       "pinchbench_url": null,
       "params_b": 4.0,
-      "context_k": 128
+      "context_k": 128,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Qwen3.5-9B",
@@ -74,7 +77,8 @@
       "pinchbench_score": null,
       "pinchbench_url": null,
       "params_b": 9.0,
-      "context_k": 128
+      "context_k": 128,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Qwen3.5-27B",
@@ -93,7 +97,8 @@
       "pinchbench_url": "https://pinchbench.com/submission/a898858b-05e2-4655-a158-ecd334a4e983",
       "pinchbench_note": "Cloud API (FP16)",
       "params_b": 27.0,
-      "context_k": 64
+      "context_k": 64,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Qwen3.5-27B-Q5",
@@ -111,7 +116,8 @@
       "pinchbench_score": null,
       "pinchbench_url": null,
       "params_b": 27.0,
-      "context_k": 64
+      "context_k": 64,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Qwen3.5-27B-Q6",
@@ -129,7 +135,8 @@
       "pinchbench_score": null,
       "pinchbench_url": null,
       "params_b": 27.0,
-      "context_k": 64
+      "context_k": 64,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Qwen3.5-35B-A3B",
@@ -149,7 +156,8 @@
       "pinchbench_local": "63.7",
       "pinchbench_note": "78.4% = cloud API (FP16). 63.7% = our local Q4_K_XL run.",
       "params_b": 35.0,
-      "context_k": 128
+      "context_k": 128,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Qwen3.5-35B-A3B-Q5",
@@ -167,7 +175,8 @@
       "pinchbench_score": null,
       "pinchbench_url": null,
       "params_b": 35.0,
-      "context_k": 128
+      "context_k": 128,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Qwen3-Coder-30B",
@@ -185,7 +194,8 @@
       "pinchbench_score": null,
       "pinchbench_url": null,
       "params_b": 30.0,
-      "context_k": 64
+      "context_k": 64,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Qwen3.5-122B-A10B",
@@ -204,7 +214,8 @@
       "pinchbench_url": "https://pinchbench.com/submission/11368a5a-a1a0-418b-99a4-b3f9bd9c9900",
       "pinchbench_note": "Cloud API (FP16)",
       "params_b": 122.0,
-      "context_k": 8
+      "context_k": 8,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "Gemma4-26B-A4B",
@@ -222,7 +233,8 @@
       "pinchbench_score": null,
       "pinchbench_url": null,
       "params_b": 26.0,
-      "context_k": 65
+      "context_k": 65,
+      "gpus": "1x RTX 5060 Ti 16GB"
     },
     {
       "id": "GPT-OSS-120B",
@@ -241,7 +253,8 @@
       "pinchbench_url": "https://pinchbench.com/submission/ce780020-c753-49f6-a5ea-2193974b7d42",
       "pinchbench_note": "Cloud API",
       "params_b": 120.0,
-      "context_k": 128
+      "context_k": 128,
+      "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
       "id": "GLM-4.7-Flash",
@@ -259,7 +272,8 @@
       "pinchbench_score": null,
       "pinchbench_url": null,
       "params_b": 30.0,
-      "context_k": 200
+      "context_k": 200,
+      "gpus": "2x RTX 5060 Ti 16GB"
     }
   ]
 }
