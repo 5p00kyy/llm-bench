@@ -1,0 +1,53 @@
+{
+  "model": "Qwen3.6-35B-A3B",
+  "timestamp": "2026-04-17T01:04:49.609310+00:00",
+  "server": "http://192.168.0.113:8080",
+  "hardware": {
+    "gpus": "2x RTX 5060 Ti 16GB",
+    "ram": "60GB DDR4-2133 ECC",
+    "backend": "llama.cpp"
+  },
+  "vram_usage": null,
+  "tests": {
+    "short_prompt": {
+      "description": "Short prompt (~20 tok) \u2192 256 gen tokens",
+      "runs": 3,
+      "best_generation_tok_s": 83.7,
+      "avg_generation_tok_s": 83.3,
+      "best_prompt_eval_tok_s": 368.0,
+      "avg_prompt_eval_tok_s": 297.9,
+      "avg_prompt_tokens": 19,
+      "avg_completion_tokens": 256
+    },
+    "medium_prompt": {
+      "description": "Medium prompt (~2K tok) \u2192 256 gen tokens",
+      "runs": 3,
+      "best_generation_tok_s": 82.7,
+      "avg_generation_tok_s": 82.6,
+      "best_prompt_eval_tok_s": 97.9,
+      "avg_prompt_eval_tok_s": 909.0,
+      "avg_prompt_tokens": 1996,
+      "avg_completion_tokens": 256
+    },
+    "long_prompt": {
+      "description": "Long prompt (~8K tok) \u2192 256 gen tokens",
+      "runs": 3,
+      "best_generation_tok_s": 79.5,
+      "avg_generation_tok_s": 79.3,
+      "best_prompt_eval_tok_s": 94.6,
+      "avg_prompt_eval_tok_s": 1101.0,
+      "avg_prompt_tokens": 6663,
+      "avg_completion_tokens": 256
+    },
+    "long_generation": {
+      "description": "Short prompt \u2192 1024 gen tokens",
+      "runs": 3,
+      "best_generation_tok_s": 83.4,
+      "avg_generation_tok_s": 83.4,
+      "best_prompt_eval_tok_s": 566.5,
+      "avg_prompt_eval_tok_s": 577.0,
+      "avg_prompt_tokens": 40,
+      "avg_completion_tokens": 1024
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "description": "Speed and VRAM data for local models on 2x RTX 5060 Ti 16GB",
   "hardware": "2x RTX 5060 Ti 16GB (32GB total), 60GB DDR4-2133 ECC, llama.cpp",
   "tensor_split": "17,32 \u2014 GPU0: ~13.4GB, GPU1: ~13.9GB",
-  "updated": "2026-04-03T13:20:00Z",
+  "updated": "2026-04-17T01:06:00Z",
   "models": [
     {
       "id": "Qwen3.5-0.8B",
@@ -176,6 +176,25 @@
       "pinchbench_url": null,
       "params_b": 35.0,
       "context_k": 128,
+      "gpus": "2x RTX 5060 Ti 16GB"
+    },
+    {
+      "id": "Qwen3.6-35B-A3B",
+      "name": "Qwen3.6-35B-A3B",
+      "family": "Qwen3.6",
+      "params": "35B total / 3B active",
+      "quant": "UD-IQ4_XS",
+      "arch": "moe",
+      "file_size_mb": 16909,
+      "gen_tok_s": 83.4,
+      "pp_tok_s": 97.9,
+      "load_time_s": null,
+      "vram_total_mb": null,
+      "notes": "Thinking-enabled MoE (A3B) on llama.cpp, IQ4_XS, 204.8K context. Very fast generation, but the thinking preset can spend small completion budgets in hidden reasoning before visible output.",
+      "pinchbench_score": null,
+      "pinchbench_url": null,
+      "params_b": 35.0,
+      "context_k": 205,
       "gpus": "2x RTX 5060 Ti 16GB"
     },
     {
