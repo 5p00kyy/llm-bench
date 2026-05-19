@@ -1,13 +1,10 @@
 # llm-bench
 
-Real-world speed tests and VRAM data for local LLMs running on consumer hardware.
+This repository is archived.
 
-**Hardware:** 2× RTX 5060 Ti 16GB | 60GB DDR4-2133 ECC | llama.cpp
+The benchmark data and public results surface were folded into **club-5060ti**, which is now the maintained home for RTX 5060 Ti local LLM recipes, benchmark receipts, and historical llm-bench imports.
 
-**What's here:**
-- Generation tok/s and prompt processing speed for models from 0.8B to 122B
-- VRAM fit map — what loads where
-- PinchBench quality scores (local quantized vs cloud API baseline)
-- Every quant we test, not just the flagship size
+- Current site: https://5p00kyy.github.io/club-5060ti/
+- Current repo: https://github.com/5p00kyy/club-5060ti
 
-Site: https://5p00kyy.github.io/llm-bench
+The old llm-bench rows remain useful as historical provenance, but they should not be treated as current benchmark evidence unless rerun under the club-5060ti benchmark protocol.
